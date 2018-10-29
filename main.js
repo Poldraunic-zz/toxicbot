@@ -7,6 +7,7 @@ bot.config = config;
 bot.on("message", (message) => {
   //Petuh logic
   if (message.content.startsWith("!petuh")) {
+    message.channel.send("Петушара бля!");
   }
 });
 
