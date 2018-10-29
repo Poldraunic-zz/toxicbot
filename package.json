@@ -2,7 +2,7 @@
   "name": "toxicbot",
   "version": "0.0.1",
   "description": "The holy smite of Toxicshroom",
-  "main": "bot.js",
+  "main": "main.js",
   "author": "Toxicshroom",
   "dependencies": {
     "discord.js": "^11.4.2",
