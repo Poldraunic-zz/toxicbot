@@ -4,6 +4,7 @@ package-lock.json
 
 # Config
 config.json
+config_toxic.json
 
 ### IDE
 
