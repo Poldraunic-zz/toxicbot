@@ -5,7 +5,7 @@ const bot = new Discord.Client();
 bot.config = config;
 
 bot.on("message", message => {
-  //Petuh logic
+  //Petuh command logic
   if (message.content.startsWith("!petuh")) {
     message.guild.members.forEach(member => {
       if (member.hoistRole != null) {
