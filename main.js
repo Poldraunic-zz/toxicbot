@@ -28,8 +28,8 @@ bot.on("message", message => {
   if (content.startsWith("!asar ") && member.hasPermission("ADMINISTRATOR")) {
     // Check if role exists
     const roles = guild.roles;
-    const roleName =  content.slice(6); // FIXME: Get rid of magic number later.
-    const role = roles.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+    const roleName =  content.slice(6).toLowerCase(); // FIXME: Get rid of magic number later.
+    const role = roles.find(r => r.name.toLowerCase() === roleName);
 
     if (!role) {
       console.log("No such role exists.");
@@ -85,7 +85,7 @@ bot.on("message", message => {
   if (content.startsWith("!iamnot ")) {
     let desiredRole = content.slice(8).toLowerCase();
 
-    if (!roleList.includes(desiredRole.toLowerCase()))
+    if (!roleList.includes(desiredRole))
     {
       console.log("Desired role is not in the list");
       return;
