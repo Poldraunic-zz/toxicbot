@@ -54,6 +54,32 @@ bot.on("message", message => {
     channel.send(embed);
   }
 
+  // Allow members to self assign a role if it is in the list.
+  if (content.startsWith("!iam ")) {
+    let desiredRole = content.slice(5).toLowerCase();
+
+    // Check if role is in the list
+    if (!roleList.includes(desiredRole))
+      return;
+
+    let role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
+
+    // Check if member has the role already
+    if (member.roles.has(role.id)) {
+      const embed = new Discord.RichEmbed()
+        .setDescription(`You already have **${role.name}** role.`)
+        .setColor(0xDE2A61);
+      channel.send(embed);
+      return;
+    }
+
+    // Add role to the member
+    member.addRole(role, "Self Assigned");
+    const embed = new Discord.RichEmbed()
+      .setDescription(`You now have **${role.name}** role.`)
+      .setColor(0x61DE2A);
+    channel.send(embed);
+  }
 });
 
 bot.login(config.token);
