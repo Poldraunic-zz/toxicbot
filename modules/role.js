@@ -1,10 +1,11 @@
 const Discord = require("discord.js");
 
-exports.onMessage = (message, roleList) => {
+exports.onMessage = (message, bot) => {
   const channel = message.channel;
   const content = message.content;
   const guild = message.guild;
   const member = message.member;
+  const state = bot.state;
 
   // Allows members with ADMINISTRATOR permission to add roles to the list of
   // self assignable roles.
@@ -20,7 +21,7 @@ exports.onMessage = (message, roleList) => {
     }
 
     // Check if role is in list already.
-    if (roleList.includes(roleName)) {
+    if (state.roleList.includes(roleName)) {
       console.log(`${role.name} is already in the list.`);
       const embed = new Discord.RichEmbed()
         .setDescription(`Role **${role.name}** is already in the list.`)
@@ -30,7 +31,7 @@ exports.onMessage = (message, roleList) => {
     }
 
     // Add role name to the list.
-    roleList.push(role.name.toLowerCase());
+    state.roleList.push(role.name.toLowerCase());
     const embed = new Discord.RichEmbed()
       .setDescription(`Role **${role.name}** has been added to the list.`)
       .setColor(0x61de2a);
@@ -42,7 +43,7 @@ exports.onMessage = (message, roleList) => {
     let desiredRole = content.slice(5).toLowerCase();
 
     // Check if role is in the list
-    if (!roleList.includes(desiredRole)) return;
+    if (!state.roleList.includes(desiredRole)) return;
 
     let role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
 
@@ -67,7 +68,7 @@ exports.onMessage = (message, roleList) => {
   if (content.startsWith("!iamnot ")) {
     let desiredRole = content.slice(8).toLowerCase();
 
-    if (!roleList.includes(desiredRole)) {
+    if (!state.roleList.includes(desiredRole)) {
       console.log("Desired role is not in the list");
       return;
     }
@@ -82,4 +83,6 @@ exports.onMessage = (message, roleList) => {
       channel.send(embed);
     }
   }
+
+  bot.state.update(state);
 };
