@@ -1,10 +1,11 @@
 const Discord = require("discord.js");
 
-exports.onMessage = (message, roleList) => {
+exports.onMessage = (message, bot) => {
   const channel = message.channel;
   const content = message.content;
   const guild = message.guild;
   const member = message.member;
+  const state = bot.state;
 
   // Allows members with ADMINISTRATOR permission to add roles to the list of
   // self assignable roles.
@@ -20,7 +21,7 @@ exports.onMessage = (message, roleList) => {
     }
 
     // Check if role is in list already.
-    if (roleList.find(r => r.name.toLowerCase() === roleName)) {
+    if (state.roleList.find(r => r.name.toLowerCase() === roleName)) {
       console.log(`${role.name} is already in the list.`);
       const embed = new Discord.RichEmbed()
         .setDescription(`Role **${role.name}** is already in the list.`)
@@ -30,7 +31,7 @@ exports.onMessage = (message, roleList) => {
     }
 
     // Add role name to the list.
-    roleList.push(role);
+    state.roleList.push(role);
     const embed = new Discord.RichEmbed()
       .setDescription(`Role **${role.name}** has been added to the list.`)
       .setColor(0x61de2a);
@@ -117,4 +118,6 @@ exports.onMessage = (message, roleList) => {
       .setColor(0x61DE2A);
     channel.send(embed);
   }
-};
+
+  bot.state.update(state);
+}
