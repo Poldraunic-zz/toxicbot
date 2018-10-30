@@ -37,7 +37,7 @@ bot.on("message", message => {
     }
 
     // Check if role is in list already.
-    if (roleList.includes(role)) {
+    if (roleList.includes(roleName)) {
       console.log(`${role.name} is already in the list.`);
       const embed = new Discord.RichEmbed()
         .setDescription(`Role **${role.name}** is already in the list.`)
