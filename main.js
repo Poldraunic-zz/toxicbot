@@ -80,6 +80,27 @@ bot.on("message", message => {
       .setColor(0x61DE2A);
     channel.send(embed);
   }
+
+  // Allow members to self remove role if it is in the list.
+  if (content.startsWith("!iamnot ")) {
+    let desiredRole = content.slice(8).toLowerCase();
+
+    if (!roleList.includes(desiredRole.toLowerCase()))
+    {
+      console.log("Desired role is not in the list");
+      return;
+    }
+
+    let role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
+
+    if (member.roles.has(role.id)) {
+      member.removeRole(role);
+      const embed = new Discord.RichEmbed()
+        .setDescription(`Role ${role.name} has been removed.`)
+        .setColor(0x61DE2A)
+      channel.send(embed);
+    }
+  }
 });
 
 bot.login(config.token);
