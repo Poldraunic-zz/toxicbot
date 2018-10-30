@@ -36,6 +36,7 @@ exports.onMessage = (message, bot) => {
       .setDescription(`Role **${role.name}** has been added to the list.`)
       .setColor(0x61de2a);
     channel.send(embed);
+    bot.writeConfig();
   }
 
   // Allow members to self assign a role if it is in the list.
