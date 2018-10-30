@@ -82,4 +82,27 @@ exports.onMessage = (message, roleList) => {
       channel.send(embed);
     }
   }
+
+  // Remove role from the list
+  if (content.startsWith("!rsar ")) {
+    let desiredRole = content.slice(6).toLowerCase();
+
+    if (!roleList.includes(desiredRole))
+    {
+      const embed = new Discord.RichEmbed()
+          .setDescription("This role isn't self-assignable")
+          .setColor(0xde2a61);
+      channel.send(embed);
+      return;
+    }
+
+    const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
+    const idx = roleList.indexOf(desiredRole);
+    roleList.splice(idx, 1);
+
+    const embed = new Discord.RichEmbed()
+        .setDescription(`Role **${role.name}** has been removed from the list of self-assignable roles.`)
+        .setColor(0x61de2a);
+    channel.send(embed);
+  }
 };
