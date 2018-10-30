@@ -20,7 +20,7 @@ exports.onMessage = (message, roleList) => {
     }
 
     // Check if role is in list already.
-    if (roleList.includes(roleName)) {
+    if (roleList.find(r => r.name.toLowerCase() === roleName)) {
       console.log(`${role.name} is already in the list.`);
       const embed = new Discord.RichEmbed()
         .setDescription(`Role **${role.name}** is already in the list.`)
@@ -30,7 +30,7 @@ exports.onMessage = (message, roleList) => {
     }
 
     // Add role name to the list.
-    roleList.push(role.name.toLowerCase());
+    roleList.push(role);
     const embed = new Discord.RichEmbed()
       .setDescription(`Role **${role.name}** has been added to the list.`)
       .setColor(0x61de2a);
@@ -40,11 +40,11 @@ exports.onMessage = (message, roleList) => {
   // Allow members to self assign a role if it is in the list.
   if (content.startsWith("!iam ")) {
     let desiredRole = content.slice(5).toLowerCase();
+    const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
 
     // Check if role is in the list
-    if (!roleList.includes(desiredRole)) return;
-
-    let role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
+    if (!role)
+      return;
 
     // Check if member has the role already
     if (member.roles.has(role.id)) {
@@ -66,18 +66,17 @@ exports.onMessage = (message, roleList) => {
   // Allow members to self remove role if it is in the list.
   if (content.startsWith("!iamnot ")) {
     let desiredRole = content.slice(8).toLowerCase();
+    const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
 
-    if (!roleList.includes(desiredRole)) {
+    if (!role) {
       console.log("Desired role is not in the list");
       return;
     }
 
-    let role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
-
     if (member.roles.has(role.id)) {
       member.removeRole(role);
       const embed = new Discord.RichEmbed()
-        .setDescription(`Role ${role.name} has been removed.`)
+        .setDescription(`Role **${role.name}** has been removed.`)
         .setColor(0x61de2a);
       channel.send(embed);
     }
@@ -87,7 +86,8 @@ exports.onMessage = (message, roleList) => {
   if (content.startsWith("!rsar ")) {
     let desiredRole = content.slice(6).toLowerCase();
 
-    if (!roleList.includes(desiredRole))
+    const role = roleList.find(r => r.name.toLowerCase() === desiredRole);
+    if (!role)
     {
       const embed = new Discord.RichEmbed()
           .setDescription("This role isn't self-assignable")
@@ -96,8 +96,7 @@ exports.onMessage = (message, roleList) => {
       return;
     }
 
-    const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
-    const idx = roleList.indexOf(desiredRole);
+    const idx = roleList.indexOf(role);
     roleList.splice(idx, 1);
 
     const embed = new Discord.RichEmbed()
