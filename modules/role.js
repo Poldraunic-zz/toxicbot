@@ -104,4 +104,17 @@ exports.onMessage = (message, roleList) => {
         .setColor(0x61de2a);
     channel.send(embed);
   }
+
+  // List all self-assignable roles from the list
+  if (content === "!lsar")
+  {
+    let roles = "";
+    roleList.forEach(function (role) {roles += role.name + "\n";});
+
+    const embed = new Discord.RichEmbed()
+      .setTitle(`There are ${roleList.length} self assignable roles`)
+      .setDescription(roles)
+      .setColor(0x61DE2A);
+    channel.send(embed);
+  }
 };
