@@ -1,44 +1,36 @@
 const Discord = require("discord.js");
 
-const updateRoles = function(context) {
-  let guildRoles = context.guild.roles;
-  let updatedRoles = [];
-  let newRole;
-  for (let role of context.state.roleList) {
-    if (newRole = guildRoles.find(r => r.id === role.id)) {
-      updatedRoles.push(newRole);
-    }
-    context.state.roleList = updatedRoles;
-  }
-};
-
-// Allows members with ADMINISTRATOR permission to add roles to the list of
+// Allow members with ADMINISTRATOR permission to add roles to the list of
 // self assignable roles.
 const asarHandler = function(context) {
-  updateRoles(context);
-
   const member = context.member;
   const guild = context.guild;
   const state = context.state;
   const channel = context.channel;
   const bot = context.bot;
 
+  // Check if argument is provided
+  if (!context.data) {
+    console.log("No argument provided.");
+    return;
+  }
+
   if(!member.hasPermission("ADMINISTRATOR")) {
     return;
   }
-  // Check if role exists
-  const roles = guild.roles;
-  const roleName = context.data;
 
+  // Check if role exists in the guild
+  const roleName = context.data.toLowerCase();
+  const roles = guild.roles;
   const role = roles.find(r => r.name.toLowerCase() === roleName);
 
   if (!role) {
-    console.log("No such role exists.");
+    console.log('No such role in the guild.');
     return;
   }
 
   // Check if role is in list already.
-  if (state.roleList.find(r => r.name.toLowerCase() === roleName)) {
+  if (state.roleList.includes(role.name)) {
     console.log(`${role.name} is already in the list.`);
     const embed = new Discord.RichEmbed()
       .setDescription(`Role **${role.name}** is already in the list.`)
@@ -48,7 +40,7 @@ const asarHandler = function(context) {
   }
 
   // Add role name to the list.
-  state.roleList.push(role);
+  state.roleList.push(role.name);
   const embed = new Discord.RichEmbed()
     .setDescription(`Role **${role.name}** has been added to the list.`)
     .setColor(0x61de2a);
@@ -62,12 +54,24 @@ const iamHandler = function(context) {
   const member = context.member;
   const channel = context.channel;
   const desiredRole = context.data;
+  const roleList = context.state.roleList;
 
-  const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
+  if (!context.data) {
+    console.log("No argument provided.");
+    return;
+  }
+
+  // Check if role exists in the guild
+  const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole.toLowerCase());
+  if (!role) {
+    console.log("No such role in the guild.");
+    return;
+  }
 
   // Check if role is in the list
-  if (!role)
+  if (!roleList.includes(role.name)) {
     return;
+  }
 
   // Check if member has the role already
   if (member.roles.has(role.id)) {
@@ -92,47 +96,73 @@ const iamnotHandler = function(context) {
   const member = context.member;
   const channel = context.channel;
   const desiredRole = context.data;
+  const roleList = context.state.roleList;
 
-  const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
+  if (!context.data) {
+    console.log("No argument provided.");
+    return;
+  }
 
+  // Check if role exists in the guild
+  const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole.toLowerCase());
   if (!role) {
+    console.log("No such role in the guild.");
+    return;
+  }
+
+  // Check if role is in the list
+  if (!roleList.includes(role.name)) {
     console.log("Desired role is not in the list");
     return;
   }
 
+  // Remove role from the member
   if (member.roles.has(role.id)) {
     member.removeRole(role);
     const embed = new Discord.RichEmbed()
-      .setDescription(`Role **${role.name}** has been removed.`)
-      .setColor(0x61de2a);
+    .setDescription(`Role **${role.name}** has been removed.`)
+    .setColor(0x61de2a);
     channel.send(embed);
   }
 };
 
-// Remove role from the list
+// Allow members with ADMINISTRATOR permission to remove roles from the list of
+// self assignable roles.
 const rsarHandler = function(context) {
-  updateRoles(context);
+  const guild = context.guild;
   const desiredRole = context.data;
   const channel = context.channel;
   const roleList = context.state.roleList;
   const bot = context.bot;
   const member = context.member;
 
+  if (!context.data) {
+    console.log("No argument provided.");
+    return;
+  }
+
   if(!member.hasPermission("ADMINISTRATOR")) {
     return;
   }
 
-  const role = roleList.find(r => r.name.toLowerCase() === desiredRole);
-  if (!role)
-  {
+  // Check if role exists in the guild
+  const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole.toLowerCase());
+  if (!role) {
+    console.log("No such role in the guild.");
+    return;
+  }
+
+  // Check if role is in the list
+  if (!roleList.includes(role.name)) {
     const embed = new Discord.RichEmbed()
-      .setDescription("This role isn't self-assignable")
+      .setDescription("This role isn\'t self-assignable")
       .setColor(0xde2a61);
     channel.send(embed);
     return;
   }
 
-  const idx = roleList.indexOf(role);
+  // Remove role from the list
+  const idx = roleList.indexOf(role.name);
   roleList.splice(idx, 1);
   const embed = new Discord.RichEmbed()
     .setDescription(`Role **${role.name}** has been removed from the list of self-assignable roles.`)
@@ -141,15 +171,11 @@ const rsarHandler = function(context) {
   bot.writeConfig();
 };
 
-// List all self-assignable roles from the list
+// Allow members to see all self-assignable roles
 const lsarHandler = function(context) {
-  updateRoles(context);
-
   const channel = context.channel;
   const roleList = context.state.roleList;
-
-  let roles = "";
-  roleList.forEach(function (role) {roles += role.name + "\n";});
+  const roles = roleList.join("\n");
 
   const embed = new Discord.RichEmbed()
     .setTitle(`There are ${roleList.length} self assignable roles`)
@@ -187,4 +213,3 @@ exports.onMessage = (message, bot) => {
     }
   }
 };
-
