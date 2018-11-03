@@ -1,22 +1,8 @@
 const Discord = require("discord.js");
 
-const updateRoles = function(context) {
-  let guildRoles = context.guild.roles;
-  let updatedRoles = [];
-  let newRole;
-  for (let role of context.state.roleList) {
-    if (newRole = guildRoles.find(r => r.id === role.id)) {
-      updatedRoles.push(newRole);
-    }
-    context.state.roleList = updatedRoles;
-  }
-};
-
 // Allows members with ADMINISTRATOR permission to add roles to the list of
 // self assignable roles.
 const asarHandler = function(context) {
-  updateRoles(context);
-
   const member = context.member;
   const guild = context.guild;
   const state = context.state;
@@ -111,7 +97,6 @@ const iamnotHandler = function(context) {
 
 // Remove role from the list
 const rsarHandler = function(context) {
-  updateRoles(context);
   const desiredRole = context.data;
   const channel = context.channel;
   const roleList = context.state.roleList;
@@ -143,8 +128,6 @@ const rsarHandler = function(context) {
 
 // List all self-assignable roles from the list
 const lsarHandler = function(context) {
-  updateRoles(context);
-
   const channel = context.channel;
   const roleList = context.state.roleList;
 
