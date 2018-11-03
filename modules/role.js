@@ -129,6 +129,7 @@ const iamnotHandler = function(context) {
 // Allow members with ADMINISTRATOR permission to remove roles from the list of
 // self assignable roles.
 const rsarHandler = function(context) {
+  const guild = context.guild;
   const desiredRole = context.data;
   const channel = context.channel;
   const roleList = context.state.roleList;
@@ -145,7 +146,7 @@ const rsarHandler = function(context) {
   }
 
   // Check if role exists in the guild
-  const role = roleList.find(r => r.name.toLowerCase() === desiredRole);
+  const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole.toLowerCase());
   if (!role) {
     console.log("No such role in the guild.");
     return;
