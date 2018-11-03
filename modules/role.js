@@ -9,6 +9,12 @@ const asarHandler = function(context) {
   const channel = context.channel;
   const bot = context.bot;
 
+  // Check if argument is provided
+  if (!context.data) {
+    console.log("No argument provided.");
+    return;
+  }
+
   if(!member.hasPermission("ADMINISTRATOR")) {
     return;
   }
@@ -47,11 +53,16 @@ const iamHandler = function(context) {
   const guild = context.guild;
   const member = context.member;
   const channel = context.channel;
-  const desiredRole = context.data.toLowerCase();
+  const desiredRole = context.data;
   const roleList = context.state.roleList;
 
+  if (!context.data) {
+    console.log("No argument provided.");
+    return;
+  }
+
   // Check if role exists in the guild
-  const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole);
+  const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole.toLowerCase());
   if (!role) {
     console.log("No such role in the guild.");
     return;
@@ -87,6 +98,11 @@ const iamnotHandler = function(context) {
   const desiredRole = context.data;
   const roleList = context.state.roleList;
 
+  if (!context.data) {
+    console.log("No argument provided.");
+    return;
+  }
+
   // Check if role exists in the guild
   const role = guild.roles.find(r => r.name.toLowerCase() === desiredRole.toLowerCase());
   if (!role) {
@@ -118,6 +134,11 @@ const rsarHandler = function(context) {
   const roleList = context.state.roleList;
   const bot = context.bot;
   const member = context.member;
+
+  if (!context.data) {
+    console.log("No argument provided.");
+    return;
+  }
 
   if(!member.hasPermission("ADMINISTRATOR")) {
     return;
