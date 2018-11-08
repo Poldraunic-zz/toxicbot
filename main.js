@@ -35,4 +35,6 @@ bot.on("message", message => {
   role.onMessage(message, bot);
 });
 
+bot.on("error", console.error);
+
 bot.login(config.token);
