@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const config = require("./config_toxic.json");
 const role = require("./modules/role.js");
+const petuh = require("./modules/petuh.js");
 const fs = require('fs');
 
 const bot = new Discord.Client();
@@ -10,7 +11,8 @@ const state = {
       this[key] = newState[key];
     });
   },
-  roleList: []
+  roleList: [],
+  petuh_list: []
 };
 
 bot.state = state;
@@ -33,6 +35,7 @@ bot.on("ready", () => {
 
 bot.on("message", message => {
   role.onMessage(message, bot);
+  petuh.onMessage(message, bot);
 });
 
 bot.on("error", console.error);
