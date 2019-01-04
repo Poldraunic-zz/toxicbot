@@ -4,6 +4,7 @@ const fs = require('fs');
 const config = require("./config_toxic.json");
 const petuh = require("./modules/petuh.js");
 const role = require("./modules/role.js");
+const quoter = require("./modules/quoter");
 
 // Bot state
 const bot = new Discord.Client();
@@ -72,6 +73,7 @@ bot.on('raw', async event => {
 bot.on("message", message => {
   role.onMessage(message, bot);
   petuh.onMessage(message, bot);
+  quoter.onMessage(message, bot);
 });
 
 // Catch reactions
