@@ -65,7 +65,7 @@ const quoteHandler = function(context) {
 
   for (let id of bot.state.textChannels) {
     let chan = guild.channels.get(id);
-    
+
     chan.fetchMessage(msgID).then(message => {
       const embed = createEmbed(message, user);
       channel.send(embed);
@@ -77,12 +77,19 @@ const quoteHandler = function(context) {
 
 const createEmbed = function(message, requester) {
   let timestamp = message.createdAt.toString();
-  const idx = timestamp.indexOf(" (");
+  let idx = timestamp.indexOf(" (");
   timestamp = timestamp.slice(0, idx);
+
+  let attachments = message.attachments;
+  let attachment = attachments.find(a => a.filename.endsWith(".png") || a.filename.endsWith(".jpg"));
+
+  if (!attachment)
+    return;
 
   let embed = new Discord.RichEmbed()
     .setAuthor(`${message.author.username}#${message.author.discriminator}`, message.author.avatarURL)
     .setDescription(message.content)
+    .setThumbnail(attachment.url)
     .setFooter(`Requested by: ${requester.username}#${requester.discriminator} | Message from #${message.channel.name} | ${timestamp}`)
     .setColor(0x61DE2A);
 
