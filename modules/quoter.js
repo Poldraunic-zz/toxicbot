@@ -40,19 +40,39 @@ exports.onMessage = (message, bot) => {
   }
 };
 
-const quoteHandler = function(context) {
-  const channel = context.channel;
-  const guild = context.guild;
-  const user = context.author;
-  const msgID = context.data;
+exports.getTextChannels = (bot) => {
+  const guildChans = bot.guilds.first().channels;
 
-  const textChannels = guild.channels.array();
-  for (let chan of textChannels)
-    if (chan.type === "text")
-      chan.fetchMessage(msgID).then(message => {
-        const embed = createEmbed(message, user);
-        channel.send(embed);
-      });
+  if (!guildChans)
+    return;
+
+  const textChans = guildChans.filter(c => c.type === "text");
+  bot.state.textChannels = [];
+
+  textChans.forEach(function(chan) {
+    bot.state.textChannels.push(chan.id);
+  });
+
+  bot.writeConfig();
+};
+
+const quoteHandler = function(context) {
+  const bot = context.bot;
+  const guild = context.guild;
+  const channel = context.channel;
+  const msgID = context.data;
+  const user = context.author;
+
+  for (let id of bot.state.textChannels) {
+    let chan = guild.channels.get(id);
+    
+    chan.fetchMessage(msgID).then(message => {
+      const embed = createEmbed(message, user);
+      channel.send(embed);
+    }).catch(error =>
+      console.log(`Message ${id} not found in channel ${chan.id}`)
+    );
+  }
 };
 
 const createEmbed = function(message, requester) {
