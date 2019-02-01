@@ -8,7 +8,7 @@ exports.onReactionAdd = (reaction, user) => {
   if (emoji.name !== "💬")
     return;
 
-  const embed = createEmbed(message, message.author);
+  const embed = createEmbed(message, user);
   channel.send(embed);
 };
 
@@ -40,27 +40,57 @@ exports.onMessage = (message, bot) => {
   }
 };
 
-const quoteHandler = function(context) {
-  const channel = context.channel;
-  const guild = context.guild;
-  const user = context.author;
-  const msgID = context.data;
+exports.getTextChannels = (bot) => {
+  const guildChans = bot.guilds.first().channels;
 
-  const textChannels = guild.channels.array();
-  for (let chan of textChannels)
-    if (chan.type === "text")
-      chan.fetchMessage(msgID).then(message => {
-        const embed = createEmbed(message, user);
-        channel.send(embed);
-      });
+  if (!guildChans)
+    return;
+
+  const textChans = guildChans.filter(c => c.type === "text");
+  bot.state.textChannels = [];
+
+  textChans.forEach(function(chan) {
+    bot.state.textChannels.push(chan.id);
+  });
+
+  bot.writeConfig();
 };
 
-const createEmbed = function(message, user) {
+const quoteHandler = function(context) {
+  const bot = context.bot;
+  const guild = context.guild;
+  const channel = context.channel;
+  const msgID = context.data;
+  const user = context.author;
+
+  for (let id of bot.state.textChannels) {
+    let chan = guild.channels.get(id);
+
+    chan.fetchMessage(msgID).then(message => {
+      const embed = createEmbed(message, user);
+      channel.send(embed);
+    }).catch(error =>
+      console.log(`Message ${id} not found in channel ${chan.id}`)
+    );
+  }
+};
+
+const createEmbed = function(message, requester) {
+  let timestamp = message.createdAt.toString();
+  let idx = timestamp.indexOf(" (");
+  timestamp = timestamp.slice(0, idx);
+
+  let attachments = message.attachments;
+  let attachment = attachments.find(a => a.filename.endsWith(".png") || a.filename.endsWith(".jpg"));
+
+  if (!attachment)
+    return;
+
   let embed = new Discord.RichEmbed()
-    .setAuthor(`${user.username}#${user.discriminator}`, user.avatarURL, message.url)
+    .setAuthor(`${message.author.username}#${message.author.discriminator}`, message.author.avatarURL)
     .setDescription(message.content)
-    .setFooter(`Message from #${message.channel.name}`)
-    .setTimestamp(message.createdAt)
+    .setThumbnail(attachment.url)
+    .setFooter(`Requested by: ${requester.username}#${requester.discriminator} | Message from #${message.channel.name} | ${timestamp}`)
     .setColor(0x61DE2A);
 
   return embed;

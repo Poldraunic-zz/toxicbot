@@ -15,7 +15,8 @@ const state = {
     });
   },
   roleList: [],
-  petuh_list: []
+  petuh_list: [],
+  textChannels: []
 };
 
 // Write bot state to file
@@ -38,6 +39,8 @@ bot.on("ready", () => {
   } else {
     config.state = state;
   }
+
+  quoter.getTextChannels(bot)
 });
 
 // Workaround for catching reactions to old messages
@@ -80,6 +83,19 @@ bot.on("message", message => {
 bot.on('messageReactionAdd', (reaction, user) => {
   quoter.onReactionAdd(reaction, user);
   console.log(`${user.username} reacted with "${reaction.emoji.name}".`);
+});
+
+bot.on('channelCreate', (channel) => {
+  if (channel.type === "text")
+    bot.state.textChannels.push(channel.id);
+});
+
+bot.on('channelDelete', (channel) => {
+  if (channel.type !== "text")
+    return;
+
+  let idx = bot.state.textChannels.indexOf(channel.id);
+  bot.state.textChannels.splice(idx, 1);
 });
 
 // Catch errors
